@@ -104,3 +104,28 @@ uvicorn.run(starlette_app, host="0.0.0.0", port=8800)
 - 导入 quote_generator 模块失败时会打印错误信息并抛出异常
 - attestQuote 工具包含超时和连接错误处理
 - 所有工具错误都会返回包含错误信息的 JSON 响应
+
+
+
+## Tests with curl
+
+# 测试根路径
+curl -s http://localhost:8800/
+
+# 测试健康检查
+curl -s http://localhost:8800/health
+
+# 测试工具列表
+curl -s http://localhost:8800/api/tools
+
+# 测试getRawTDXQuote
+curl -s -X POST -H "Content-Type: application/json" http://localhost:8800/api/getRawTDXQuote
+
+# 测试attestTDXQuote
+curl -s -X POST -H "Content-Type: application/json" -d '{"url":"http://47.76.235.246:8080/attestation"}' http://localhost:8800/api/attestTDXQuote
+
+# 测试getTEEStatus
+curl -s -X POST -H "Content-Type: application/json" http://localhost:8800/api/getTEEStatus
+
+# 测试fetchTDEventlog
+curl -s -X POST -H "Content-Type: application/json" http://localhost:8800/api/fetchTDEventlog
