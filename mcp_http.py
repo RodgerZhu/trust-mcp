@@ -85,14 +85,14 @@ async def attest_quote(url):
         # 3. Package according to evidence data structure
         evidence = {
             "quote": quote_base64,
-            "aa_eventlog": None,
             "cc_eventlog": None
         }
         
         # 4. Transcode evidence (URL safe Base64 without padding)
         evidence_json = json.dumps(evidence)
-        evidencebase64 = base64.b64encode(evidence_json.encode()).decode()
-        evidencebase64 = evidencebase64.replace('+', '-').replace('/', '_').replace('=', '')
+        evidence_base64 = base64.urlsafe_b64encode(evidence_json.encode()).decode()
+        evidencebase64 = evidence_base64.rstrip('=')
+
         
         # 5. Package req structure
         req = {
@@ -109,7 +109,12 @@ async def attest_quote(url):
         # Timeout set to 5 seconds
         response_attest = requests.post(url, json=req, timeout=5)
         dec_response_att = response_attest.text.split('.')[1]
-        dec_response_att = base64.b64decode(dec_response_att).decode('utf-8')
+        # padding
+        padding_needed = 4 - (len(dec_response_att) % 4)
+        if padding_needed != 4:
+             dec_response_att += '=' * padding_needed
+
+        dec_response_att = base64.urlsafe_b64decode(dec_response_att).decode('utf-8')
 
         print(f"Response attest raw: {dec_response_att}")
         result = {'status': 200, 'attest_result': dec_response_att}
